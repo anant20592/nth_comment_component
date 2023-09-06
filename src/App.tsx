@@ -39,6 +39,29 @@ export const App: FC<{ name: string }> = ({ name }) => {
     });
     setComments([...comments]);
   };
+
+  const add = { replies: [{ replies: [{ replies: [] }] }] };
+  const renderReplies = (replies) => {
+    if (add.replies.length === 0) {
+      return null;
+    }
+    // for(let i = 0; i < add.length; i++){
+    return renderReplies(add.replies);
+    // return(
+    //   <div
+    //           style={{
+    //             border: '1px solid black',
+    //             marginLeft: '16px',
+    //             marginTop: '8px',
+    //           }}
+    //         >
+    //           <p>User {'reply.id'}</p>
+    //           <p>{'reply.text'}</p>
+    //           <button>Reply</button>
+    //         </div>
+    // )
+    //}
+  };
   return (
     <div>
       <h1>Nth Level Comment Component</h1>
@@ -50,19 +73,10 @@ export const App: FC<{ name: string }> = ({ name }) => {
             <p>{comment.text}</p>
             <button onClick={() => addReply(comment.id)}>Reply</button>
           </div>
-          {comment.replies.map((reply) => (
-            <div
-              style={{
-                border: '1px solid black',
-                marginLeft: '16px',
-                marginTop: '8px',
-              }}
-            >
-              <p>User {reply.id}</p>
-              <p>{reply.text}</p>
-              <button>Reply</button>
-            </div>
-          ))}
+          {renderReplies(comment.replies)}
+          {/* {comment.replies.map((reply) => (
+            
+          ))} */}
         </>
       ))}
     </div>
