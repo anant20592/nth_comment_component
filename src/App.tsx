@@ -1,7 +1,8 @@
-import { FC, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 
 import './style.css';
 import { v4 as uuidv4 } from 'uuid';
+import CommentBox from './CommentBox';
 
 const commentsArr = [
   {
@@ -37,18 +38,11 @@ interface CommentI {
 }
 
 export const App: FC<{ name: string }> = ({ name }) => {
-  const [comments, setComments] = useState<CommentI[]>([]);
-  const [comment, setComment] = useState<string>('');
+  const [commentList, setCommentList] = useState<CommentI[]>([]);
+  const [openBoxId, setOpenBoxId] = useState<string>("");
+  const [showCommentBox, setShowCommentBox] = useState<boolean>(false);
   const addComment = () => {
-    setComments([
-      ...comments,
-      {
-        id: uuidv4(),
-        text: comment,
-        replies: [],
-        parentId: null,
-      },
-    ]);
+    
   };
 
   const addReply = (commentId: string, replies) => {
@@ -103,27 +97,81 @@ export const App: FC<{ name: string }> = ({ name }) => {
     setComment(e.target.value);
   };
 
+  const onSubmit = (comment: string) => {
+    setCommentList([
+      ...commentList,
+      {
+        id: uuidv4(),
+        text: comment,
+        replies: [],
+        parentId: null,
+      },
+    ]);
+    setShowCommentBox(false);
+  };
+
+  const handleReply = (reply: string, commentId: string) => {
+    setOpenBoxId("");
+    const updatedCommentList = commentList.map(comment => {
+      if(comment.id === commentId){
+        comment.replies.push({
+          id: uuidv4(),
+          text: reply,
+          replies: [],
+          parentId: null,
+        })
+      }
+      return comment;
+    });
+    setCommentList(updatedCommentList);
+  }
+
   return (
     <div>
       <h1>Nth Level Comment Component</h1>
-      <textarea value={comment} onChange={handleChange} />
-      <button onClick={addComment}>Add Comment</button>
-      {comments.map((comment) => (
-        <>
+      <div
+        style={{
+          border: '1px solid grey',
+          borderRadius: '4px',
+          padding: '8px',
+        }}
+      >
+        This is a post
+      </div>
+      <div style={{ margin: '4px 0' }}>
+        <button
+          // /style={{ float: 'right' }}
+          onClick={() => setShowCommentBox(true)}
+        >
+          Comment
+        </button>
+      </div>
+      {showCommentBox && (
+        <CommentBox onSubmit={(comment) => onSubmit(comment)} />
+      )}
+      <div style={{margin: '4px 0 4px 8px'}}>
+      {commentList.map((comment) => (
+        <Fragment key={comment.id}>
           <div style={{ border: '1px solid black' }}>
             <p>User {comment.id}</p>
             <p>{comment.text}</p>
-            <button onClick={() => addReply(comment.id, comments)}>
+            <button onClick={() => setOpenBoxId(comment.id)}>
               Reply
             </button>
           </div>
+          {openBoxId === comment.id && (
+          <div style={{margin: '4px 0'}}>
+            <CommentBox onSubmit={(reply) => handleReply(reply, comment.id)} />
+          </div>
+          )}
           {
             <div style={{ marginLeft: '16px', marginTop: '8px' }}>
               {renderReplies(comment.replies)}
             </div>
           }
-        </>
+        </Fragment>
       ))}
+      </div>
     </div>
   );
 };
