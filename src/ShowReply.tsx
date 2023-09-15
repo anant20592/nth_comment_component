@@ -5,9 +5,10 @@ import CommentBox from './CommentBox';
 interface ShowReplyProps {
   comment: CommentI;
   onSubmit: (comment: string, id: string) => void;
+  onDelete: (commentId: string) => void;
 }
 
-const ShowReply = ({ comment, onSubmit }: ShowReplyProps) => {
+const ShowReply = ({ comment, onSubmit, onDelete }: ShowReplyProps) => {
   const [addReply, setAddReply] = useState<boolean>(false);
   return (
     <Fragment key={comment.id}>
@@ -16,7 +17,7 @@ const ShowReply = ({ comment, onSubmit }: ShowReplyProps) => {
         <p>{comment.text}</p>
         <button onClick={() => setAddReply(true)}>Reply</button>
         <button onClick={() => setAddReply(true)}>Edit</button>
-        <button onClick={() => setAddReply(true)}>Delete</button>
+        <button onClick={() => onDelete(comment.id)}>Delete</button>
       </div>
       {addReply && (
         <div style={{ margin: '4px 0' }}>

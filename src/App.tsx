@@ -65,6 +65,24 @@ export const App: FC<{ name: string }> = ({ name }) => {
     return { ...comment, replies: latestReply };
   };
 
+  const removeReply = (commentId: string) => {
+    let updatedList = [];
+    commentList.forEach((comment) => {
+      updatedList.push(removeNode(comment, commentId));
+    });
+    setCommentList([...updatedList]);
+  };
+
+  const removeNode = (comment: CommentI, id: string) => {
+    if (comment.id == id) {
+      comment = null;
+      return comment;
+    }
+    let latestReply = comment.replies.map((child) => removeNode(child, id));
+    let notNullReply = latestReply.filter((reply) => reply !== null);
+    return { ...comment, replies: notNullReply };
+  };
+
   const renderReplies = (replies: CommentI[]) => {
     return (
       <>
@@ -73,6 +91,7 @@ export const App: FC<{ name: string }> = ({ name }) => {
             <ShowReply
               comment={reply}
               onSubmit={(comment, id) => addReply(comment, id)}
+              onDelete={(id) => removeReply(id)}
             />
             {reply.replies.length > 0 && (
               <div>{renderReplies(reply.replies)}</div>
